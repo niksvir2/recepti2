@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://recepti2.onrender.com/api'; // Ваш актуальный URL API
 
 let currentUser = null;
 let authToken = null;
@@ -29,7 +29,8 @@ function initializeRecipeCards() {
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', async function() {
-	   initializeRecipeCards();
+    initializeRecipeCards();
+    
     // Проверяем сохраненный токен
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -39,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             authToken = token;
             updateAuthState();
         } catch (error) {
+            console.error('Ошибка верификации токена:', error);
             localStorage.removeItem('authToken');
         }
     }
@@ -67,13 +69,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password }),
+                credentials: 'include' // Для куков, если используются
             });
             
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error);
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Ошибка входа');
             }
             
             const data = await response.json();
@@ -84,7 +90,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             closeAuthModal();
             showAlert('Вы успешно вошли в систему!');
         } catch (error) {
-            showAlert(error.message, 'error');
+            console.error('Ошибка входа:', error);
+            showAlert(error.message || 'Ошибка при входе', 'error');
         }
     });
 
@@ -103,13 +110,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({ name, email, password })
             });
             
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error);
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Ошибка регистрации');
             }
             
             const data = await response.json();
@@ -120,7 +130,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             closeAuthModal();
             showAlert('Регистрация прошла успешно!');
         } catch (error) {
-            showAlert(error.message, 'error');
+            console.error('Ошибка регистрации:', error);
+            showAlert(error.message || 'Ошибка при регистрации', 'error');
         }
     });
 
@@ -145,15 +156,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Проверка токена
 async function verifyToken(token) {
-    const response = await fetch(`${API_URL}/verify`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    if (!response.ok) {
-        throw new Error('Недействительный токен');
+    try {
+        const response = await fetch(`${API_URL}/verify`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Недействительный токен');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Ошибка верификации токена:', error);
+        throw error;
     }
-    
-    return response.json();
 }
 
 // Функции для работы с модальными окнами
@@ -226,7 +245,7 @@ window.onclick = function(event) {
 function updateAuthState() {
     if (currentUser) {
         authBtn.textContent = 'Выйти';
-        favoritesBtn.style.display = 'block';
+        if (favoritesBtn) favoritesBtn.style.display = 'block';
         
         // Показываем звездочки для избранного
         document.querySelectorAll('.favorite-star').forEach(star => {
@@ -237,9 +256,10 @@ function updateAuthState() {
         updateFavoriteStars();
     } else {
         authBtn.textContent = 'Войти';
-        favoritesBtn.style.display = 'none';
-        document.querySelector('#favorites').classList.remove('active');
-        document.querySelector('[data-category="soups"]').click();
+        if (favoritesBtn) favoritesBtn.style.display = 'none';
+        if (document.querySelector('[data-category="soups"]')) {
+            document.querySelector('[data-category="soups"]').click();
+        }
         
         // Скрываем звездочки для избранного
         document.querySelectorAll('.favorite-star').forEach(star => {
@@ -267,12 +287,14 @@ async function toggleFavorite(event, recipeId) {
                 method: 'DELETE',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
                 }
             });
             
             if (!response.ok) {
-                throw new Error('Ошибка при удалении из избранного');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Ошибка при удалении из избранного');
             }
             
             star.classList.remove('favorite');
@@ -284,13 +306,15 @@ async function toggleFavorite(event, recipeId) {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({ recipeId: recipeId.toString() }) // Преобразуем в строку
+                body: JSON.stringify({ recipeId: recipeId.toString() })
             });
             
             if (!response.ok) {
-                throw new Error('Ошибка при добавлении в избранное');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Ошибка при добавлении в избранное');
             }
             
             star.classList.add('favorite');
@@ -298,12 +322,11 @@ async function toggleFavorite(event, recipeId) {
             showAlert('Рецепт добавлен в избранное');
         }
         
-        // Обновляем отображение избранного, если открыта соответствующая вкладка
-        if (favoritesSection.classList.contains('active')) {
-            updateFavoritesDisplay();
-        }
+        // Обновляем отображение избранного
+        updateFavoritesDisplay();
     } catch (error) {
-        showAlert(error.message, 'error');
+        console.error('Ошибка при работе с избранным:', error);
+        showAlert(error.message || 'Ошибка при работе с избранным', 'error');
     }
 }
 
@@ -312,7 +335,10 @@ async function updateFavoriteStars() {
     
     try {
         const response = await fetch(`${API_URL}/favorites`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
+            headers: { 
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json'
+            }
         });
         
         if (!response.ok) {
@@ -323,13 +349,13 @@ async function updateFavoriteStars() {
         const favoriteRecipes = data.favorites || [];
         
         document.querySelectorAll('.dish-card').forEach(card => {
-            const recipeId = card.getAttribute('data-recipe-id'); // Получаем как строку
+            const recipeId = card.getAttribute('data-recipe-id');
             const star = card.querySelector('.favorite-star');
             
-            if (favoriteRecipes.includes(recipeId)) {
+            if (star && favoriteRecipes.includes(recipeId)) {
                 star.classList.add('favorite');
                 star.textContent = '★';
-            } else {
+            } else if (star) {
                 star.classList.remove('favorite');
                 star.textContent = '☆';
             }
@@ -340,6 +366,8 @@ async function updateFavoriteStars() {
 }
 
 async function updateFavoritesDisplay() {
+    if (!favoritesSection) return;
+    
     favoritesSection.innerHTML = '';
     
     if (!currentUser) {
@@ -349,7 +377,10 @@ async function updateFavoritesDisplay() {
     
     try {
         const response = await fetch(`${API_URL}/favorites`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
+            headers: { 
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json'
+            }
         });
         
         if (!response.ok) {
@@ -364,8 +395,6 @@ async function updateFavoritesDisplay() {
             return;
         }
         
-        // Здесь должна быть логика для отображения избранных рецептов
-        // В реальном приложении нужно будет получать полные данные рецептов по их ID
         favoriteRecipes.forEach(recipeId => {
             const recipeCard = document.querySelector(`.dish-card[data-recipe-id="${recipeId}"]`);
             if (recipeCard) {
@@ -374,6 +403,7 @@ async function updateFavoritesDisplay() {
             }
         });
     } catch (error) {
+        console.error('Ошибка при загрузке избранного:', error);
         favoritesSection.innerHTML = `<p>Ошибка при загрузке избранного: ${error.message}</p>`;
     }
 }
@@ -401,12 +431,10 @@ function showAlert(message, type = 'success') {
         setTimeout(() => alert.remove(), 500);
     }, 3000);
 }
-// Для обратной совместимости со старым кодом
-function showRecipe(title, image, ingredients, steps) {
-    showRecipeModal(title, image, ingredients, steps);
-}
 
 // Обработчик для кнопки "Избранное"
-favoritesBtn.addEventListener('click', function() {
-    updateFavoritesDisplay();
-});
+if (favoritesBtn) {
+    favoritesBtn.addEventListener('click', function() {
+        updateFavoritesDisplay();
+    });
+}
