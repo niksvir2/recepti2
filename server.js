@@ -3,10 +3,14 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path'); // Добавьте этот модуль для работы с путями
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public'))); // Обслуживание статических файлов
 
 const SECRET_KEY = 'your_secret_key';
 
@@ -15,6 +19,11 @@ let db = {
     users: [],
     favorites: {}
 };
+
+// Корневой маршрут - отдаём index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Регистрация
 app.post('/api/register', async (req, res) => {
@@ -35,7 +44,6 @@ app.post('/api/register', async (req, res) => {
         
         db.users.push(newUser);
         
-        // Создаем токен
         const token = jwt.sign({ userId: newUser.id }, SECRET_KEY, { expiresIn: '1h' });
         
         res.status(201).json({ token, user: { id: newUser.id, name: newUser.name, email: newUser.email } });
@@ -59,7 +67,6 @@ app.post('/api/login', async (req, res) => {
             return res.status(400).json({ error: 'Неверный email или пароль' });
         }
         
-        // Создаем токен
         const token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '1h' });
         
         res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
@@ -87,7 +94,7 @@ app.post('/api/favorites', authenticateToken, (req, res) => {
 // Удаление из избранного
 app.delete('/api/favorites/:recipeId', authenticateToken, (req, res) => {
     const userId = req.user.userId;
-    const recipeId = req.params.recipeId; // Уже строка
+    const recipeId = req.params.recipeId;
     
     if (db.favorites[userId]) {
         db.favorites[userId] = db.favorites[userId].filter(id => id !== recipeId);
@@ -120,7 +127,7 @@ function authenticateToken(req, res, next) {
     });
 }
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
 });
