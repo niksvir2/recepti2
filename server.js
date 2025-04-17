@@ -1,4 +1,3 @@
-require('dotenv').config(); // Для загрузки переменных окружения
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -20,7 +19,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Безопасность: секретный ключ из переменных окружения
-const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key-here';
+const SECRET_KEY = process.env.SECRET_KEY || 'ваш-резервный-ключ-для-разработки';
 
 // Временная "база данных" (в реальном проекте замените на MongoDB/PostgreSQL)
 let db = {
