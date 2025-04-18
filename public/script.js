@@ -24,6 +24,28 @@ function initializeRecipeCards() {
             star.onclick = (e) => toggleFavorite(e, recipeId);
             card.insertBefore(star, card.firstChild);
         }
+        
+        // Добавляем обработчик клика на всю карточку
+        const img = card.querySelector('.dish-img');
+        const clickHandler = () => {
+            const title = card.querySelector('.dish-title').textContent;
+            const imgSrc = img.src;
+            const ingredients = card.querySelector('.dish-ingredients').textContent.replace('Ингредиенты:', '').trim().split(', ');
+            const steps = card.querySelector('.dish-recipe').textContent.replace('Кратко:', '').trim().split('. ').filter(step => step);
+            
+            showRecipeModal(title, imgSrc, ingredients, steps);
+        };
+        
+        // Удаляем старый обработчик с изображения
+        img.onclick = null;
+        
+        // Добавляем обработчик на всю карточку
+        card.onclick = (e) => {
+            // Проверяем, не кликнули ли мы на звездочку
+            if (!e.target.classList.contains('favorite-star')) {
+                clickHandler();
+            }
+        };
     });
 }
 
