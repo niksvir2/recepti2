@@ -221,7 +221,6 @@ function showRegisterForm() {
     document.getElementById('registerName').focus();
 }
 
-// Функции для работы с рецептами
 function showRecipeModal(title, image, ingredients, steps) {
     const modal = document.getElementById('recipeModal');
     document.getElementById('modalRecipeTitle').textContent = title;
@@ -244,24 +243,6 @@ function showRecipeModal(title, image, ingredients, steps) {
         stepsList.appendChild(li);
     });
     
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-    
-    // Заполняем шаги приготовления
-    const stepsList = document.getElementById('modalRecipeSteps');
-    if (stepsList) {
-        stepsList.innerHTML = '';
-        steps.forEach(step => {
-            if (step.trim()) { // Проверяем, не пустая ли строка
-                const li = document.createElement('li');
-                li.textContent = step.trim();
-                stepsList.appendChild(li);
-            }
-        });
-    }
-    
-    // Показываем модальное окно
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
