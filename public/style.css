@@ -12,25 +12,29 @@ header {
     background-color: #c11;
     color: white;
     padding: 20px;
+    text-align: center; /* Центрируем текст */
+    position: relative; /* Для позиционирования кнопки */
 }
 .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
+      max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    text-align: center;
+    position: relative;
 }
 .auth-btn {
-    background-color: white;
+   background-color: white;
     color: #c11;
     border: none;
-    padding: 8px 16px;
+    padding: 12px 24px; /* Увеличиваем padding */
     border-radius: 40px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s;
+    font-size: 16px; /* Увеличиваем размер шрифта */
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 .auth-btn:hover {
     background-color: #f0f0f0;
@@ -77,6 +81,7 @@ h1 {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     transition: transform 0.3s;
     position: relative;
+    cursor: pointer; /* Добавляем курсор указателя */
 }
 .dish-card:hover {
     transform: translateY(-5px);
