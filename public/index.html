@@ -415,23 +415,23 @@
     </div>
 
     <!-- Модальное окно для рецепта -->
-    <div id="recipeModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
-        <h2 id="modalRecipeTitle"></h2>
-        <img id="modalRecipeImg" src="" alt="" class="modal-dish-img">
-        
-        <div class="modal-section">
-            <h3>Ингредиенты:</h3>
-            <ul id="modalRecipeIngredients"></ul>
-        </div>
-        
-        <div class="modal-section">
-            <h3>Приготовление:</h3>
-            <ol id="modalRecipeSteps"></ol>
+   <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img id="modalRecipeImg" src="" alt="" class="modal-img">
+            <h2 id="modalRecipeTitle" class="modal-title"></h2>
+            
+            <div class="modal-section">
+                <h3>Ингредиенты</h3>
+                <ul id="modalRecipeIngredients" class="ingredients-list"></ul>
+            </div>
+            
+            <div class="modal-section">
+                <h3>Пошаговый рецепт</h3>
+                <ol id="modalRecipeSteps" class="steps-list"></ol>
+            </div>
         </div>
     </div>
-</div>
 
     <footer>
         <p>© 2025 Русская кухня - все права защищены</p>
