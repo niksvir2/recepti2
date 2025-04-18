@@ -224,28 +224,29 @@ function showRegisterForm() {
 // Функции для работы с рецептами
 function showRecipeModal(title, image, ingredients, steps) {
     const modal = document.getElementById('recipeModal');
-    if (!modal) return; // Проверяем, существует ли модальное окно
+    document.getElementById('modalRecipeTitle').textContent = title;
+    document.getElementById('modalRecipeImg').src = image;
+    document.getElementById('modalRecipeImg').alt = title;
     
-    // Устанавливаем заголовок и изображение
-    const titleElement = document.getElementById('modalRecipeTitle');
-    const imgElement = document.getElementById('modalRecipeImg');
-    
-    if (titleElement) titleElement.textContent = title;
-    if (imgElement) {
-        imgElement.src = image;
-        imgElement.alt = title;
-    }
-    
-    // Заполняем ингредиенты
     const ingredientsList = document.getElementById('modalRecipeIngredients');
-    if (ingredientsList) {
-        ingredientsList.innerHTML = '';
-        ingredients.forEach(ingredient => {
-            const li = document.createElement('li');
-            li.textContent = ingredient.trim();
-            ingredientsList.appendChild(li);
-        });
-    }
+    ingredientsList.innerHTML = '';
+    ingredients.forEach(ingredient => {
+        const li = document.createElement('li');
+        li.textContent = ingredient;
+        ingredientsList.appendChild(li);
+    });
+    
+    const stepsList = document.getElementById('modalRecipeSteps');
+    stepsList.innerHTML = '';
+    steps.forEach(step => {
+        const li = document.createElement('li');
+        li.textContent = step;
+        stepsList.appendChild(li);
+    });
+    
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
     
     // Заполняем шаги приготовления
     const stepsList = document.getElementById('modalRecipeSteps');
